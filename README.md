@@ -6,7 +6,7 @@ JS-ECS is a javascript Entity Component System designed around relational refere
 
 ## Installation
 
-Since JS-ECS is prebuilt, you can simply download ![/build/ecs.js](https://github.com/InteractiveTimmy/js-ecs/blob/development/build/ecs.js) and import it via CommonJS or ES6 syntax. Alternatively, if you would like to rebuild the bundled files, you will need to install the dev-dependencies via npm using the command `npm install`.
+Since JS-ECS is prebuilt, you can simply download [/build/ecs.js](https://github.com/InteractiveTimmy/js-ecs/blob/development/build/ecs.js) and import it via CommonJS or ES6 syntax. Alternatively, if you would like to rebuild the bundled files, you will need to install the dev-dependencies via npm using the command `npm install`.
 
 ## Building
 
