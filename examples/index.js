@@ -7,7 +7,7 @@ try
 }
 catch
 {
-  ECS = require( '../build/ecs.module.js' );
+  ECS = require( '../build/ecs.js' );
   console.log( 'node instance detected' );
 }
 
@@ -257,7 +257,7 @@ function run ( controls )
 let myControls = [
   {
     name: 'light',
-    maxEntities: 2000,
+    maxEntities: 1000,
     componentChanceEntities: 0.5,
     duration: 10000,
     components: [
@@ -283,7 +283,7 @@ let myControls = [
   },
   {
     name: 'medium',
-    maxEntities: 4000,
+    maxEntities: 2000,
     componentChanceEntities: 0.5,
     duration: 10000,
     components: [
@@ -309,7 +309,7 @@ let myControls = [
   },
   {
     name: 'heavy',
-    maxEntities: 8000,
+    maxEntities: 4000,
     componentChanceEntities: 0.5,
     duration: 10000,
     components: [
@@ -335,7 +335,7 @@ let myControls = [
   },
   {
     name: 'extra heavy',
-    maxEntities: 16000,
+    maxEntities: 8000,
     componentChanceEntities: 0.5,
     duration: 10000,
     components: [
@@ -383,11 +383,12 @@ function trial ( index = 0 )
     console.log( `ticks per second: ${myStatistics.run.tps}` );
     console.log( `total entities: ${myScene.children.length}` );
     console.log( `total component types: ${r.components.length} `);
-    console.log( '  \nsystem report' );
+    console.log( '  \n' );
+    console.log( 'system report' );
     r.systems.forEach( system => {
       console.log( `${system.constructor.name} ${myScene.getEntitiesByComponents( ...myInstance.systems[system.constructor.name].components ).length} entitites` );
     } );
-    console.log( '  \n  \n' );
+    console.log( '  \n' );
 
     if ( index + 1 < myControls.length )
     { setTimeout( ( ) => { trial( index + 1 ); }, 100 ); }

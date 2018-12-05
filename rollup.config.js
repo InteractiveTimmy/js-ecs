@@ -4,12 +4,12 @@ export default {
     {
       format: 'umd',
       name: 'ECS',
-      file: 'build/ecs.module.js',
+      file: 'build/ecs.js',
       indent: '\t'
     },
     {
       format: 'es',
-      file: 'build/ecs.js',
+      file: 'build/ecs.module.js',
       indent: '\t'
     }
   ],
