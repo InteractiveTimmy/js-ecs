@@ -1,18 +1,16 @@
 import ECSObject from './ecs-object.js';
 
-class Entity extends ECSObject
+class Scene extends ECSObject
 {
   constructor ( )
   {
     super( );
 
-    Object.defineProperty( this, 'isEntity', { value: true, writable: false } );
-
-    this.components = { };
+    Object.defineProperty( this, 'isScene', { value: true, writable: false } );
   }
 
   canLoad ( ...items )
-  { return ( super.canLoad( ...items ) && items.every( item => ( item.isComponent && !this.components[item.constructor.name] ) ) ); }
+  { return ( super.canLoad( ...items ) && items.every( item => ( item.isEntity ) ) ); }
 
   canUnload ( ...items )
   { return ( super.canUnload( ...items ) ); }
@@ -27,7 +25,6 @@ class Entity extends ECSObject
 
         item.parent = this;
         this.children.push( item );
-        this.components[item.constructor.name] = item;
       } );
     }
     else
@@ -43,7 +40,6 @@ class Entity extends ECSObject
       items.forEach( item => {
         item.parent = null;
         this.children.splice( this.children.indexOf( item ), 1 );
-        delete this.components[item.constructor.name];
       } );
     }
     else
@@ -51,6 +47,17 @@ class Entity extends ECSObject
 
     return this;
   }
+
+  getEntitiesByComponents ( ...components )
+  {
+    return this.children.filter( entity => ( 
+      components.every( component => (
+        ( entity.components[component.name] ) ?
+        ( entity.components[component.name].constructor === component ) :
+        false
+      ) )
+    ) );
+  }
 }
 
-export default Entity;
+export default Scene;

@@ -1,18 +1,18 @@
 import ECSObject from './ecs-object.js';
 
-class Entity extends ECSObject
+class Instance extends ECSObject
 {
   constructor ( )
   {
     super( );
 
-    Object.defineProperty( this, 'isEntity', { value: true, writable: false } );
+    Object.defineProperty( this, 'isInstance', { value: true, writable: false } );
 
-    this.components = { };
+    this.systems = { };
   }
 
   canLoad ( ...items )
-  { return ( super.canLoad( ...items ) && items.every( item => ( item.isComponent && !this.components[item.constructor.name] ) ) ); }
+  { return ( super.canLoad( ...items ) && items.every( item => ( item.isSystem && !this.systems[item.constructor.name] ) ) ); }
 
   canUnload ( ...items )
   { return ( super.canUnload( ...items ) ); }
@@ -27,7 +27,7 @@ class Entity extends ECSObject
 
         item.parent = this;
         this.children.push( item );
-        this.components[item.constructor.name] = item;
+        this.systems[item.constructor.name] = item;
       } );
     }
     else
@@ -43,7 +43,7 @@ class Entity extends ECSObject
       items.forEach( item => {
         item.parent = null;
         this.children.splice( this.children.indexOf( item ), 1 );
-        delete this.components[item.constructor.name];
+        delete this.systems[item.constructor.name];
       } );
     }
     else
@@ -51,6 +51,13 @@ class Entity extends ECSObject
 
     return this;
   }
+
+  update ( scene, dt )
+  {
+    this.children.forEach( system => {
+      system.update( scene.getEntitiesByComponents( ...system.components ), dt );
+    } );
+  }
 }
 
-export default Entity;
+export default Instance;
