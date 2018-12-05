@@ -1,0 +1,28 @@
+{
+  "name": "js-ecs",
+  "version": "0.1.0",
+  "description": "JavaScript Entity Component System",
+  "main": "index.js",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js",
+    "build": "rollup -c",
+    "watch": "rollup -c --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/InteractiveTimmy/js-ecs.git"
+  },
+  "author": "InteractiveTimmy",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/InteractiveTimmy/js-ecs/issues"
+  },
+  "homepage": "https://github.com/InteractiveTimmy/js-ecs#readme",
+  "devDependencies": {
+    "rollup": "^0.67.3"
+  }
+}
