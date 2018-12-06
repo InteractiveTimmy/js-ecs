@@ -1,6 +1,6 @@
 # js-ecs
 
-# Description
+## Description
 
 JS-ECS is a javascript Entity Component System designed around relational references. This project was influenced by a number of previous ECS projects that were too far out of scope, and poorly planned. After some work, it was decided that the best way to approach making a larger, more complete project was to seperate this into it's own repository.
 
