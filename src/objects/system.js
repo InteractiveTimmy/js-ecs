@@ -1,24 +1,20 @@
-import { UUID } from '../utils/index.js';
+import ECSObject from './ecs-object';
 
-class System
+import Entity from './entity';
+
+class System extends ECSObject
 {
   constructor ( )
   {
     Object.defineProperties( this, {
-      uuid: { value: UUID( ), writable: false },
-      isSystem: { value: true, writable: false }
+      type: { value: 'System', writable: false },
+      isSystem: { value: true, writable: false },
+      components: { value: [ ], writable: false },
+      entities: { value: [ ], writable: false }
     } );
-
-    this.parent = null;
-    this.components = [ ];
   }
 
-  update ( entities, dt )
-  {
-    this.onUpdate( entities, dt );
-  }
-
-  onUpdate ( entities, dt )
+  load ( ...items )
   {
     
   }

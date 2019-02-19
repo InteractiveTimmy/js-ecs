@@ -8,6 +8,12 @@ export default {
       indent: '\t'
     },
     {
+      format: 'umd',
+      name: 'ECS',
+      file: 'examples/ecs.js',
+      indent: '\t'
+    },
+    {
       format: 'es',
       file: 'build/ecs.module.js',
       indent: '\t'

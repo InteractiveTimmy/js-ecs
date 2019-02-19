@@ -1,4 +1,4 @@
-import ECSObject from './ecs-object.js';
+import ECSObject from './ecs-object';
 
 class Instance extends ECSObject
 {
@@ -6,56 +6,58 @@ class Instance extends ECSObject
   {
     super( );
 
-    Object.defineProperty( this, 'isInstance', { value: true, writable: false } );
-
-    this.systems = { };
+    Object.defineProperties( this, {
+      type: { value: 'Instance', writable: false },
+      isInstance: { value: true, writable: false },
+      webworkers: { value: [ ], writable: false },
+      systems: { value: [ ], writable: false },
+      entities: { value: [ ], writable: false },
+      components: { value: [ ], writable: false },
+      stats: { value: { }, writable: false }
+    } );
   }
-
-  canLoad ( ...items )
-  { return ( super.canLoad( ...items ) && items.every( item => ( item.isSystem && !this.systems[item.constructor.name] ) ) ); }
-
-  canUnload ( ...items )
-  { return ( super.canUnload( ...items ) ); }
 
   load ( ...items )
   {
-    if ( this.canLoad( ...items ) )
-    {
-      items.forEach( item => {
-        if ( item.parent )
-        { item.parent.unload( item ); }
+    items.forEach( item => {
+      switch ( item.type )
+      {
+        case 'System':
+          this.loadSystems( item );
+          break;
 
-        item.parent = this;
-        this.children.push( item );
-        this.systems[item.constructor.name] = item;
-      } );
-    }
-    else
-    { console.warn( 'ERROR', 'unable to load items' ); }
+        case 'Entity':
+          this.loadEntities( item );
+          break;
+        
+        case 'Component':
+          this.loadComponents( item );
+          break;
 
-    return this;
-  }
-
-  unload ( ...items )
-  {
-    if ( this.canUnload( ...items ) )
-    {
-      items.forEach( item => {
-        item.parent = null;
-        this.children.splice( this.children.indexOf( item ), 1 );
-        delete this.systems[item.constructor.name];
-      } );
-    }
-    else
-    { console.warn( 'ERROR', 'unable to unload items' ); }
+        default:
+          break;
+      }
+    } );
 
     return this;
   }
 
-  update ( scene, dt )
+  loadComponents ( entity, ...components )
   {
-    this.children.forEach( system => {
-      system.update( scene.getEntitiesByComponents( ...system.components ), dt );
+
+  }
+
+  loadSystems ( ...systems )
+  {
+    systems.forEach( system => {
+      if ( system.type !== system ) { break; }
+
+      this.entities.forEach( entity => {
+
+        entity.components.forEach( component => {
+
+        } );
+      } );
     } );
   }
 }

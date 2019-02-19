@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>title</title>
+  </head>
+  <body>
+
+    <script>
+      const myWorker = new Worker( 'ww.js' );
+
+      class myClass
+      {
+        constructor ( )
+        {
+          this.myData = new Uint8Array(1024 * 1024 * 32) // 32MB
+          
+          for (var i = 0; i < this.myData.length; ++i) {
+            this.myData[i] = i;
+          }
+        }
+      }
+
+      const myInstance = new myClass( );
+
+      myWorker.onmessage = ( e ) => {
+        const myInstance = e.data;
+        console.log( 'mt receiving', e.data );
+      }
+      console.log( 'mt sending', myInstance );
+      myWorker.postMessage( myInstance, [ myInstance.myData.buffer ] );
+
+      console.log( 'mt after sending', myInstance );
+    </script>
+  </body>
+</html>

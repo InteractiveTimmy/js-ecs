@@ -1,9 +1,9 @@
-let arr = [ ];
+const arr = [ ];
 
 for ( let i = 0; i < 256; i++ )
 { arr[i] = ( i < 16 ? '0' : '' ) + ( i ).toString( 16 ); }
 
-let UUID = ( ) =>
+export default ( ) =>
 {
   let a = Math.random( ) * 0xffffffff | 0;
   let b = Math.random( ) * 0xffffffff | 0;
@@ -18,5 +18,3 @@ let UUID = ( ) =>
 
   return o.toUpperCase( );
 };
-
-export default UUID;

@@ -1,9 +1,9 @@
-let arr = [ ];
+const arr = [ ];
 
 for ( let i = 0; i < 256; i++ )
 { arr[i] = ( i < 16 ? '0' : '' ) + ( i ).toString( 16 ); }
 
-let UUID = ( ) =>
+var UUID = ( ) =>
 {
   let a = Math.random( ) * 0xffffffff | 0;
   let b = Math.random( ) * 0xffffffff | 0;
@@ -23,52 +23,14 @@ class ECSObject
 {
   constructor ( )
   {
+    const uuid = UUID( );
+
     Object.defineProperties( this, {
-      uuid: { value: UUID( ), writable: false },
-      isECSObject: { value: true, writable: false }
+      uuid: { value: uuid, writable: false },
+      id: { value: new TextEncoder( 'utf-8' ).encode( uuid ), writable: false }
     } );
 
     this.parent = null;
-    this.children = [ ];
-  }
-
-  canLoad ( ...items )
-  { return items.every( item => ( !this.children.includes( item ) ) ); }
-
-  canUnload ( ...items )
-  { return items.every( item => ( this.children.includes( item ) ) ); }
-
-  load ( ...items )
-  {
-    if ( this.canLoad( ...items ) )
-    {
-      items.forEach( item => {
-        if ( item.parent )
-        { item.parent.unload( item ); }
-
-        item.parent = this;
-        this.children.push( item );
-      } );
-    }
-    else
-    { console.warn( 'ERROR', 'unable to load items' ); }
-
-    return this;
-  }
-
-  unload ( ...items )
-  {
-    if ( this.canUnload( ...items ) )
-    {
-      items.forEach( item => {
-        item.parent = null;
-        this.children.splice( this.children.indexOf( item ), 1 );
-      } );
-    }
-    else
-    { console.warn( 'ERROR', 'unable to unload items' ); }
-
-    return this;
   }
 }
 
@@ -78,208 +40,90 @@ class Entity extends ECSObject
   {
     super( );
 
-    Object.defineProperty( this, 'isEntity', { value: true, writable: false } );
+    Object.defineProperties( this, {
+      type: { value: 'Entity', writable: false },
+      isEntity: { value: true, writable: false },
+      components: { value: [ ], writable: false },
+      systems: { value: [ ], writable: false }
+    } );
 
-    this.components = { };
+    this.parent = null;
+    this.valid = false;
   }
-
-  canLoad ( ...items )
-  { return ( super.canLoad( ...items ) && items.every( item => ( item.isComponent && !this.components[item.constructor.name] ) ) ); }
-
-  canUnload ( ...items )
-  { return ( super.canUnload( ...items ) ); }
 
   load ( ...items )
   {
-    if ( this.canLoad( ...items ) )
-    {
-      items.forEach( item => {
-        if ( item.parent )
-        { item.parent.unload( item ); }
-
-        item.parent = this;
-        this.children.push( item );
-        this.components[item.constructor.name] = item;
-      } );
+    this.valid = false;
+    if ( this.parent ) {
+      this.parent.valid = false;
+      this.parent.invalidEntites.push( this );
     }
-    else
-    { console.warn( 'ERROR', 'unable to load items' ); }
 
-    return this;
-  }
+    items.forEach( ( item ) => {
+      if ( this[item.type] ) { return; }
 
-  unload ( ...items )
-  {
-    if ( this.canUnload( ...items ) )
-    {
-      items.forEach( item => {
-        item.parent = null;
-        this.children.splice( this.children.indexOf( item ), 1 );
-        delete this.components[item.constructor.name];
-      } );
-    }
-    else
-    { console.warn( 'ERROR', 'unable to unload items' ); }
-
-    return this;
-  }
-}
-
-class Scene extends ECSObject
-{
-  constructor ( )
-  {
-    super( );
-
-    Object.defineProperty( this, 'isScene', { value: true, writable: false } );
-  }
-
-  canLoad ( ...items )
-  { return ( super.canLoad( ...items ) && items.every( item => ( item.isEntity ) ) ); }
-
-  canUnload ( ...items )
-  { return ( super.canUnload( ...items ) ); }
-
-  load ( ...items )
-  {
-    if ( this.canLoad( ...items ) )
-    {
-      items.forEach( item => {
-        if ( item.parent )
-        { item.parent.unload( item ); }
-
-        item.parent = this;
-        this.children.push( item );
-      } );
-    }
-    else
-    { console.warn( 'ERROR', 'unable to load items' ); }
-
-    return this;
-  }
-
-  unload ( ...items )
-  {
-    if ( this.canUnload( ...items ) )
-    {
-      items.forEach( item => {
-        item.parent = null;
-        this.children.splice( this.children.indexOf( item ), 1 );
-      } );
-    }
-    else
-    { console.warn( 'ERROR', 'unable to unload items' ); }
-
-    return this;
-  }
-
-  getEntitiesByComponents ( ...components )
-  {
-    return this.children.filter( entity => ( 
-      components.every( component => (
-        ( entity.components[component.name] ) ?
-        ( entity.components[component.name].constructor === component ) :
-        false
-      ) )
-    ) );
-  }
-}
-
-class Instance extends ECSObject
-{
-  constructor ( )
-  {
-    super( );
-
-    Object.defineProperty( this, 'isInstance', { value: true, writable: false } );
-
-    this.systems = { };
-  }
-
-  canLoad ( ...items )
-  { return ( super.canLoad( ...items ) && items.every( item => ( item.isSystem && !this.systems[item.constructor.name] ) ) ); }
-
-  canUnload ( ...items )
-  { return ( super.canUnload( ...items ) ); }
-
-  load ( ...items )
-  {
-    if ( this.canLoad( ...items ) )
-    {
-      items.forEach( item => {
-        if ( item.parent )
-        { item.parent.unload( item ); }
-
-        item.parent = this;
-        this.children.push( item );
-        this.systems[item.constructor.name] = item;
-      } );
-    }
-    else
-    { console.warn( 'ERROR', 'unable to load items' ); }
-
-    return this;
-  }
-
-  unload ( ...items )
-  {
-    if ( this.canUnload( ...items ) )
-    {
-      items.forEach( item => {
-        item.parent = null;
-        this.children.splice( this.children.indexOf( item ), 1 );
-        delete this.systems[item.constructor.name];
-      } );
-    }
-    else
-    { console.warn( 'ERROR', 'unable to unload items' ); }
-
-    return this;
-  }
-
-  update ( scene, dt )
-  {
-    this.children.forEach( system => {
-      system.update( scene.getEntitiesByComponents( ...system.components ), dt );
+      item.parent = this;
     } );
   }
 }
 
-class Component
+class Component extends ECSObject
 {
   constructor ( )
   {
     Object.defineProperties( this, {
-      uuid: { value: UUID( ), writable: false },
-      isComponent: { value: true, writable: false }
+      struct: { value: 'Component', writable: false },
+      type: { value: this.constructor.name.toLowerCase( ), writable: false },
+      isComponent: { value: true, writable: false },
+      entities: { value: [ ], writable: true }
     } );
-
-    this.parent = null;
   }
 }
 
-class System
+function canLoad ( parent, child )
 {
-  constructor ( )
-  {
-    Object.defineProperties( this, {
-      uuid: { value: UUID( ), writable: false },
-      isSystem: { value: true, writable: false }
-    } );
-
-    this.parent = null;
-    this.components = [ ];
-  }
-
-  update ( entities, dt )
-  {
-    this.onUpdate( entities, dt );
-  }
-
-  onUpdate ( entities, dt )
-  {
-
-  }
+  return (
+    !parent.children.includes( child ) && 
+    parent.loadable.includes( child.constructor )
+  );
 }
 
-export { ECSObject, Entity, Scene, Instance, Component, System };
+function canUnload ( parent, child )
+{
+  return parent.includes( child );
+}
+
+function load ( parent, ...children )
+{
+  children.forEach( ( child ) => {
+    if ( canLoad( parent, child ) )
+    {
+      if ( child.parent )
+      { unload( child.parent, child ); }
+      
+      child.parent = parent;
+      parent.children.push( child );
+    }
+    else
+    { console.log( 'failed to load', { parent: parent, child: child } ); }
+  } );
+
+  return parent;
+}
+
+function unload ( parent, ...children )
+{
+  children.forEach( ( child ) => {
+    if ( canUnload( parent, child ) )
+    {
+      child.parent = null;
+      parent.children.splice( parent.children.indexOf( child ), 1 );
+    }
+    else
+    { console.log( 'failed to unload', { parent: parent, child: child } ); }
+  } );
+
+  return parent;
+}
+
+export { ECSObject, Entity, Component, load, unload };
